@@ -75,7 +75,7 @@ Ragna is an advanced **ransomware** tool designed for certain purposes. It encry
 
 ---
 
-### General opsec
+## General opsec
 
 - Do not leak any sensitive/private data on this repo
 - Use tools like `gitleaks` to detect sensitive/private data
