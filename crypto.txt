@@ -1,0 +1,101 @@
+
+[default]
+aws_access_key_id = F15de6feb-3242-4584-a545-74ff502ac002
+aws_secret_access_key = F15de6feb-3242-4584-a545-74ff502ac002
+
+------------------------------------------------------------------------
+RAGNAROK Ransomware Technical Documentation
+------------------------------------------------------------------------
+ 
+Document ID: F15de6feb-3242-4584-a545-74ff502ac002
+
+This document describes the encryption mechanism that is the core
+function of the RAGNAROK ransomware.
+
+To avoid using OS encryption APIs, we decided to write our own, since
+that's always the best way to do encryption right.  Our first attempt
+was foiled by even the simplest of AntiVirus software -- it was a
+custom implementation of the RC4 algorithm.
+
+Well, once that happened, we knew we had to be creative.  In our
+research, we realized we could use a pseudorandom generator to
+generate a sequence of bytes that could be applied to the plaintext
+with an XOR operation to accomplish the encryption process.  By
+choosing the seed of the random number generator, it becomes the key,
+and must be known in order to recover the plaintext later.
+
+The random number generator is a 32-bit maximum sequence linear
+feedback shift register, which is a fancy way of saying it's a random
+number generator that will not repeat its sequence until it has
+generated all possible values in the 32-bit number space.
+
+Here's how it works... we start with the key value -- this is some
+32-bit number, chosen to be the "key" for the encryption operation.
+We iterate through the bytes in the plaintext one at a time.  The
+first one is XOR'd with the lowest 8 bits of the key.  Then we apply
+an LFSR shift operation on the key, as described below.  Now the key
+is quite different, and we can use its lowest 8-bits to XOR with the
+next byte in the plain text, and so on.
+
+A linear feedback shift register is configured with some number of
+taps.  In our case, we use taps as follows:
+
+    int taps[] = {30, 26, 25}
+
+These taps will yield a maximum length sequence in an LFSR.  Each of
+these "taps" corresponds to one of the bits in the key value.  Each
+time we cycle the key, we XOR the key with bit shifts for each tap,
+and rotate the key value.
+
+The math sounds scary, but here's some C code that does the operation:
+ 
+
+    uint64_t lfsr_next(uint64_t key) {
+      int taps[] = {30, 26, 25};
+
+
+      uint32_t st = key;
+      uint32_t feedback = key;
+
+   
+      for (int i = 0; i < 3; i++) {
+        feedback ^= st >> (31 - taps[i] + 1);
+      }
+
+      return ((uint64_t)((st >> 1) | ((feedback & 1) << 31))) & 0xffffffff;
+    }
+
+ 
+So the encryption process looks like this:
+
+  (1) For all bytes in the plaintext:
+      (1) XOR the byte with the lowest order byte in the key
+      (2) Store the result in the ciphertext
+      (3) Cycle the key with the LFSR algorithm
+      (4) Continue to the next byte in the plaintext
+
+
+The plaintext is encrypted, written out to a new file, and the
+original is deleted.  Be sure to delete volume shadow copies and scrub
+slack space in the filesystem when done!
+
+
+Here's an example of encryption:
+ 
+Key = 0xdeadbeef
+ 
+
+Original file:
+ 
+00000000: 5468 6520 7175 6963 6b20 6272 6f77 6e20  The quick brown
+00000010: 666f 7820 6a75 6d70 7320 6f76 6572 2074  fox jumps over t
+00000020: 6865 206c 617a 7920 646f 672e 0d0a       he lazy dog...
+
+
+Encrypted file:
+ 
+00000000: bb1f defd 9f82 921e d5ff 0dc5 b41a d87b  ...............{
+00000010: cb39 d3f5 8080 17cd ad4f d82d 48e4 6bd1  .9.......O.-H.k.
+00000020: ba0c 14f6 ac9c 8a59 58f1 2809 1e03 bb    .......YX.(....
+
+ 
