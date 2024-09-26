@@ -1,0 +1,18 @@
+YOUR SYSTEMS HAVE BEEN LOCKED.
+
+Your files have been encrypted, and you have limited time to retrieve them. You must pay 3 BTC within 24 hours, or your data will be lost forever.
+
+Here’s what you need to do:
+1. Transfer 3 BTC to this address:
+   BTC: 1A2bcDEF34GHijKL56MnO78PQ9rstUV
+
+2. Email proof of payment to: files-restore@<EMAIL>
+
+3. Receive your decryption software and get your files back.
+
+---
+
+Important:
+- Any attempt to remove the ransomware without paying will result in complete data loss.
+- Decryption keys will be automatically destroyed after 24 hours.
+
