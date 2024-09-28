@@ -4,6 +4,8 @@
 
 ## ⚠️ DISCLAIMER
 
+Policy number F17cf172f-cf67-4539-af3a-ba760ff80ada
+
 **DO NOT** use this code for malicious purposes. Misuse of this code is ill legal, it can make you sick and can result in severe penalties, including imprisonment. 
 Always comply with the law when conducting operations.
 
@@ -57,8 +59,7 @@ Ragna is an advanced **ransomware** tool designed for certain purposes. It encry
 
 ### Pre-requisites:
 
-- Python 3.x for key management scripts.
-- OpenSSL for encryption-related tasks.
+- C compiler
 - Someone's controlled environment (do **NOT** run this on your own systems).
 
 ### Step-by-Step Guide:
